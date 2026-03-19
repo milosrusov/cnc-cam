@@ -1,0 +1,81 @@
+:host { display: flex; flex: 1; overflow: hidden; min-height: 0; }
+
+    .cad-editor {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+      align-items: stretch;
+    }
+
+    .left-toolbar {
+      width: 44px;
+      min-width: 44px;
+      max-width: 44px;
+      flex-shrink: 0;
+      align-self: stretch;
+    }
+
+    .cad-center {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .canvas-host { flex: 1; }
+
+    /* ── Align bar ── */
+    .align-bar {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 10px;
+      background: var(--bg-header);
+      border-bottom: 1px solid var(--border-color);
+      flex-shrink: 0;
+    }
+
+    .align-label {
+      font-size: 10px;
+      color: var(--text-muted);
+      margin-right: 4px;
+      white-space: nowrap;
+    }
+
+    .align-group {
+      display: flex;
+      gap: 2px;
+    }
+
+    .align-bar button {
+      background: var(--bg-hover);
+      border: 1px solid var(--border-color);
+      color: var(--text-secondary);
+      border-radius: 3px;
+      padding: 2px 8px;
+      font-size: 13px;
+      font-family: inherit;
+      cursor: pointer;
+      line-height: 1.4;
+      transition: background 0.1s, color 0.1s;
+      &:hover { background: var(--accent-dim); color: var(--accent); border-color: var(--accent); }
+    }
+
+    .align-sep {
+      width: 1px;
+      height: 16px;
+      background: var(--border-color);
+      margin: 0 4px;
+    }
+
+    .right-panel {
+      width: 220px;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      border-left: 1px solid var(--border-color);
+      background: var(--bg-panel);
+      overflow: hidden;
+    }

@@ -1,0 +1,78 @@
+    <div class="panel" style="border-right: none; flex: 1;">
+      <div class="panel-header">
+        <span>Properties</span>
+      </div>
+      <div class="panel-body">
+        @if (selected$ | async; as selected) {
+          @if (selected.length === 0) {
+            <p class="no-sel">No selection</p>
+          } @else if (selected.length > 1) {
+            <p class="no-sel">{{ selected.length }} objects selected</p>
+          } @else {
+            <div class="prop-group">
+              <div class="prop-row">
+                <span class="prop-label">Type</span>
+                <span class="prop-value">{{ selected[0].type }}</span>
+              </div>
+              <div class="prop-row">
+                <span class="prop-label">Layer</span>
+                <select class="prop-select" [value]="selected[0].layerId"
+                  (change)="changeLayer(selected[0], $any($event.target).value)">
+                  @for (l of layers$ | async; track l.id) {
+                    <option [value]="l.id">{{ l.name }}</option>
+                  }
+                </select>
+              </div>
+              <div class="prop-row">
+                <span class="prop-label">Color</span>
+                <input type="color" class="prop-color"
+                  [value]="selected[0].color ?? '#ffffff'"
+                  (change)="changeColor(selected[0], $any($event.target).value)">
+              </div>
+              @if (selected[0].type === 'line') {
+                <div class="prop-row">
+                  <span class="prop-label">Start X</span>
+                  <span class="prop-value">{{ selected[0].start.x | number:'1.2-3' }} mm</span>
+                </div>
+                <div class="prop-row">
+                  <span class="prop-label">Start Y</span>
+                  <span class="prop-value">{{ selected[0].start.y | number:'1.2-3' }} mm</span>
+                </div>
+                <div class="prop-row">
+                  <span class="prop-label">End X</span>
+                  <span class="prop-value">{{ selected[0].end.x | number:'1.2-3' }} mm</span>
+                </div>
+                <div class="prop-row">
+                  <span class="prop-label">End Y</span>
+                  <span class="prop-value">{{ selected[0].end.y | number:'1.2-3' }} mm</span>
+                </div>
+              }
+              @if (selected[0].type === 'circle') {
+                <div class="prop-row">
+                  <span class="prop-label">Center X</span>
+                  <span class="prop-value">{{ selected[0].center.x | number:'1.2-3' }} mm</span>
+                </div>
+                <div class="prop-row">
+                  <span class="prop-label">Center Y</span>
+                  <span class="prop-value">{{ selected[0].center.y | number:'1.2-3' }} mm</span>
+                </div>
+                <div class="prop-row">
+                  <span class="prop-label">Radius</span>
+                  <span class="prop-value">{{ selected[0].radius | number:'1.2-3' }} mm</span>
+                </div>
+              }
+              @if (selected[0].type === 'rectangle') {
+                <div class="prop-row">
+                  <span class="prop-label">Width</span>
+                  <span class="prop-value">{{ selected[0].width | number:'1.2-3' }} mm</span>
+                </div>
+                <div class="prop-row">
+                  <span class="prop-label">Height</span>
+                  <span class="prop-value">{{ selected[0].height | number:'1.2-3' }} mm</span>
+                </div>
+              }
+            </div>
+          }
+        }
+      </div>
+    </div>

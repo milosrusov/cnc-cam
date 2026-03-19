@@ -1,0 +1,16 @@
+    <div class="viewport" #viewport>
+      <canvas #canvas></canvas>
+
+      <div class="toolbar">
+        <button [class.active]="showStock"   (click)="toggleStock()">Stock</button>
+        <button [class.active]="showEntities" (click)="toggleEntities()">Geometry</button>
+        <button [class.active]="showToolpath" (click)="toggleToolpath()">Toolpath</button>
+        <div class="sep"></div>
+        <button (click)="resetCamera()">⌂ Reset</button>
+        <button (click)="setView('top')">Top</button>
+        <button (click)="setView('front')">Front</button>
+        <button (click)="setView('iso')">Iso</button>
+      </div>
+
+      <div class="hint">LMB drag: orbit &nbsp;|&nbsp; RMB/wheel: zoom &nbsp;|&nbsp; MMB drag: pan</div>
+    </div>

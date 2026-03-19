@@ -1,0 +1,223 @@
+    <div class="cam-layout">
+
+      <!-- LEFT: Operation list -->
+      <aside class="op-panel">
+        <div class="panel-header">
+          <span>Operations</span>
+          <div class="header-actions">
+            <button class="btn-icon" (click)="addOp('contour')" title="Add Contour">C</button>
+            <button class="btn-icon" (click)="addOp('pocket')" title="Add Pocket">P</button>
+            <button class="btn-icon" (click)="addOp('drilling')" title="Add Drilling">D</button>
+            <button class="btn-icon" (click)="addOp('facing')" title="Add Facing">F</button>
+          </div>
+        </div>
+        <div class="op-list">
+          @for (op of operations$ | async; track op.id) {
+            <div class="op-item" [class.active]="(selectedOpId$ | async) === op.id"
+              (click)="selectOp(op.id)">
+              <span class="op-type-badge" [class]="'badge-' + op.type">{{ op.type[0].toUpperCase() }}</span>
+              <div class="op-info">
+                <span class="op-name">{{ op.name }}</span>
+                <span class="op-meta">T: {{ getToolName(op.toolId) }} | {{ op.cutDepth }}mm</span>
+              </div>
+              <div class="op-status">
+                @if ((toolpathStatus$ | async)?.[op.id] === 'computing') {
+                  <span class="status-dot computing">⟳</span>
+                } @else if ((toolpathStatus$ | async)?.[op.id] === 'done') {
+                  <span class="status-dot done">✓</span>
+                } @else if ((toolpathStatus$ | async)?.[op.id] === 'error') {
+                  <span class="status-dot error">✗</span>
+                }
+              </div>
+              <button class="icon-btn danger" (click)="$event.stopPropagation(); removeOp(op.id)">✕</button>
+            </div>
+          }
+          @if ((operations$ | async)?.length === 0) {
+            <div class="empty-state">No operations yet.<br>Click C/P/D/F to add.</div>
+          }
+        </div>
+
+        <div class="op-panel-footer">
+          <button class="btn primary" (click)="computeAll()">▶ Compute All</button>
+          <button class="btn" (click)="goToGcode()">→ G-Code</button>
+        </div>
+      </aside>
+
+      <!-- CENTER: Canvas preview -->
+      <div class="cam-center">
+        <app-cam-canvas />
+        @if (totalTime) {
+          <div class="time-overlay">Est. time: {{ totalTime }}</div>
+        }
+      </div>
+
+      <!-- RIGHT: Operation properties -->
+      <aside class="props-panel">
+        @if (selectedOp) {
+          <div class="panel-header">
+            <span>{{ selectedOp.name }}</span>
+          </div>
+          <div class="props-body">
+
+            <!-- Common -->
+            <div class="prop-section">
+              <div class="section-title">General</div>
+              <label class="prop-row">
+                <span>Name</span>
+                <input class="prop-input" [(ngModel)]="selectedOp.name" (change)="saveOp()">
+              </label>
+              <label class="prop-row">
+                <span>Tool</span>
+                <select class="prop-select" [(ngModel)]="selectedOp.toolId" (change)="saveOp()">
+                  @for (t of tools$ | async; track t.id) {
+                    <option [value]="t.id">{{ t.name }} (Ø{{ t.diameter }}mm)</option>
+                  }
+                </select>
+              </label>
+              <label class="prop-row">
+                <span>Enabled</span>
+                <input type="checkbox" [(ngModel)]="selectedOp.enabled" (change)="saveOp()">
+              </label>
+            </div>
+
+            <!-- Depths -->
+            <div class="prop-section">
+              <div class="section-title">Depths</div>
+              <label class="prop-row">
+                <span>Stock Top (Z)</span>
+                <input class="prop-input num" type="number" [(ngModel)]="selectedOp.stockTop" (change)="saveOp()"> mm
+              </label>
+              <label class="prop-row">
+                <span>Cut Depth</span>
+                <input class="prop-input num" type="number" [(ngModel)]="selectedOp.cutDepth" (change)="saveOp()"> mm
+              </label>
+              <label class="prop-row">
+                <span>Step Down</span>
+                <input class="prop-input num" type="number" [(ngModel)]="selectedOp.stepDown" (change)="saveOp()"> mm
+              </label>
+              <label class="prop-row">
+                <span>Safe Z</span>
+                <input class="prop-input num" type="number" [(ngModel)]="selectedOp.safeZ" (change)="saveOp()"> mm
+              </label>
+            </div>
+
+            <!-- Feeds -->
+            <div class="prop-section">
+              <div class="section-title">Feeds & Speeds</div>
+              <label class="prop-row">
+                <span>Spindle RPM</span>
+                <input class="prop-input num" type="number" [(ngModel)]="selectedOp.spindleRPM" (change)="saveOp()">
+              </label>
+              <label class="prop-row">
+                <span>Feed Rate</span>
+                <input class="prop-input num" type="number" [(ngModel)]="selectedOp.feedRate" (change)="saveOp()"> mm/min
+              </label>
+              <label class="prop-row">
+                <span>Plunge Rate</span>
+                <input class="prop-input num" type="number" [(ngModel)]="selectedOp.plungeRate" (change)="saveOp()"> mm/min
+              </label>
+            </div>
+
+            <!-- Type-specific -->
+            @if (selectedOp.type === 'contour') {
+              <div class="prop-section">
+                <div class="section-title">Contour</div>
+                <label class="prop-row">
+                  <span>Direction</span>
+                  <select class="prop-select" [(ngModel)]="asContour(selectedOp).direction" (change)="saveOp()">
+                    <option value="climb">Climb</option>
+                    <option value="conventional">Conventional</option>
+                  </select>
+                </label>
+                <label class="prop-row">
+                  <span>Offset</span>
+                  <input class="prop-input num" type="number" [(ngModel)]="asContour(selectedOp).offset" (change)="saveOp()"> mm
+                </label>
+              </div>
+            }
+
+            @if (selectedOp.type === 'pocket') {
+              <div class="prop-section">
+                <div class="section-title">Pocket</div>
+                <label class="prop-row">
+                  <span>Step Over</span>
+                  <input class="prop-input num" type="number" step="0.05" min="0.1" max="1"
+                    [(ngModel)]="asPocket(selectedOp).stepOver" (change)="saveOp()">
+                  <span>({{ (asPocket(selectedOp).stepOver * 100) | number:'1.0-0' }}%)</span>
+                </label>
+                <label class="prop-row">
+                  <span>Direction</span>
+                  <select class="prop-select" [(ngModel)]="asPocket(selectedOp).direction" (change)="saveOp()">
+                    <option value="climb">Climb</option>
+                    <option value="conventional">Conventional</option>
+                  </select>
+                </label>
+              </div>
+            }
+
+            @if (selectedOp.type === 'drilling') {
+              <div class="prop-section">
+                <div class="section-title">Drilling</div>
+                <label class="prop-row">
+                  <span>Peck Drill</span>
+                  <input type="checkbox" [(ngModel)]="asDrilling(selectedOp).peck" (change)="saveOp()">
+                </label>
+                @if (asDrilling(selectedOp).peck) {
+                  <label class="prop-row">
+                    <span>Peck Depth</span>
+                    <input class="prop-input num" type="number" [(ngModel)]="asDrilling(selectedOp).peckDepth" (change)="saveOp()"> mm
+                  </label>
+                }
+                <label class="prop-row">
+                  <span>Dwell</span>
+                  <input class="prop-input num" type="number" [(ngModel)]="asDrilling(selectedOp).dwell" (change)="saveOp()"> s
+                </label>
+              </div>
+            }
+
+            @if (selectedOp.type === 'facing') {
+              <div class="prop-section">
+                <div class="section-title">Facing</div>
+                <label class="prop-row">
+                  <span>Step Over</span>
+                  <input class="prop-input num" type="number" step="0.05"
+                    [(ngModel)]="asFacing(selectedOp).stepOver" (change)="saveOp()">
+                  <span>({{ (asFacing(selectedOp).stepOver * 100) | number:'1.0-0' }}%)</span>
+                </label>
+                <label class="prop-row">
+                  <span>Direction</span>
+                  <select class="prop-select" [(ngModel)]="asFacing(selectedOp).direction" (change)="saveOp()">
+                    <option value="x">X (horizontal)</option>
+                    <option value="y">Y (vertical)</option>
+                  </select>
+                </label>
+              </div>
+            }
+
+            <!-- Geometry selection -->
+            <div class="prop-section">
+              <div class="section-title">Geometry</div>
+              <div class="entity-list">
+                @for (e of entities$ | async; track e.id) {
+                  <label class="entity-row">
+                    <input type="checkbox"
+                      [checked]="selectedOp.entityIds.includes(e.id)"
+                      (change)="toggleEntity(e.id, $any($event.target).checked)">
+                    <span>{{ e.type }} {{ e.id.slice(0,6) }}</span>
+                  </label>
+                }
+              </div>
+            </div>
+
+            <div class="prop-section">
+              <button class="btn primary full" (click)="computeOne()">▶ Compute Toolpath</button>
+            </div>
+
+          </div>
+        } @else {
+          <div class="empty-state" style="padding:24px;text-align:center;color:var(--text-muted)">
+            Select or create an operation
+          </div>
+        }
+      </aside>
+    </div>

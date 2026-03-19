@@ -1,0 +1,46 @@
+:host { display: flex; flex: 1; overflow: hidden; }
+
+    .canvas-wrapper {
+      position: relative;
+      flex: 1;
+      overflow: hidden;
+      background: var(--canvas-bg);
+      outline: none;
+    }
+
+    .cursor-crosshair { cursor: crosshair; }
+    .cursor-pan { cursor: grab; }
+    .cursor-pan:active { cursor: grabbing; }
+    .cursor-select { cursor: default; }
+
+    canvas {
+      position: absolute;
+      top: 0; left: 0;
+    }
+
+    .status-bar {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 0 10px;
+      background: rgba(0,0,0,0.55);
+      font-size: 11px;
+      font-variant-numeric: tabular-nums;
+      pointer-events: none;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .coords { color: var(--text-secondary); min-width: 180px; }
+    .hint { color: var(--accent); flex: 1; }
+    .zoom-level { color: var(--text-muted); margin-left: auto; }
+    .mode-badge {
+      background: var(--accent-dim);
+      color: var(--accent);
+      padding: 1px 6px;
+      border-radius: 3px;
+      font-weight: 600;
+      font-size: 10px;
+    }

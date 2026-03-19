@@ -1,0 +1,70 @@
+    <div class="gcode-layout">
+
+      <!-- LEFT: settings & export -->
+      <aside class="gcode-settings">
+        <div class="panel-header"><span>G-Code Export</span></div>
+        <div class="settings-body">
+
+          <div class="setting-group">
+            <div class="group-title">Machine</div>
+            <label class="setting-row">
+              <span>Post-Processor</span>
+              <select class="prop-select" [(ngModel)]="postProcessor" (change)="generate()">
+                <option value="uccnc">UCCNC (Stepcraft)</option>
+                <option value="mach3">Mach3</option>
+                <option value="grbl">GRBL</option>
+                <option value="fanuc">Fanuc</option>
+              </select>
+            </label>
+            <label class="setting-row">
+              <span>Units</span>
+              <select class="prop-select" [(ngModel)]="units" (change)="generate()">
+                <option value="mm">Millimeters (mm)</option>
+                <option value="inch">Inches</option>
+              </select>
+            </label>
+            <label class="setting-row">
+              <span>Program Name</span>
+              <input class="prop-input" [(ngModel)]="programName" (change)="generate()">
+            </label>
+          </div>
+
+          <div class="setting-group">
+            <div class="group-title">Info</div>
+            <div class="info-row"><span>Lines:</span><span>{{ lineCount }}</span></div>
+            <div class="info-row"><span>Est. time:</span><span>{{ estimatedTime }}</span></div>
+            <div class="info-row"><span>Operations:</span><span>{{ operationCount }}</span></div>
+          </div>
+
+          <button class="btn primary full" (click)="download()">⬇ Download .nc</button>
+          <button class="btn full" style="margin-top:6px" (click)="copyToClipboard()">
+            {{ copied ? '✓ Copied!' : '⎘ Copy to Clipboard' }}
+          </button>
+        </div>
+      </aside>
+
+      <!-- RIGHT: G-code viewer -->
+      <div class="gcode-viewer">
+        <div class="viewer-toolbar">
+          <span class="filename">{{ programName }}.nc</span>
+          <div class="viewer-actions">
+            <button class="btn-sm" (click)="generate()">↺ Refresh</button>
+          </div>
+        </div>
+        <div class="gcode-content" #gcodeContent>
+          @for (line of gcodeLines; track $index) {
+            <div class="gcode-line" [class]="getLineClass(line)">
+              <span class="line-num">{{ $index + 1 }}</span>
+              <span class="line-text">{{ line }}</span>
+            </div>
+          }
+          @if (gcodeLines.length === 0) {
+            <div class="empty-gcode">
+              No operations computed yet.<br>
+              Go to CAM tab, add operations and click "Compute All".
+            </div>
+          }
+        </div>
+      </div>
+
+    </div>

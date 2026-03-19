@@ -1,0 +1,32 @@
+<div class="app-shell">
+  <header class="app-header">
+    <div class="app-logo">
+      <span class="logo-icon">⚙</span>
+      <span class="logo-text">CNC-CAM</span>
+    </div>
+
+    <nav class="workspace-tabs">
+      @for (tab of tabs; track tab.path) {
+        <a
+          [routerLink]="tab.path"
+          routerLinkActive="active"
+          (click)="setWorkspace(tab.workspace)"
+          class="tab"
+        >
+          <span class="tab-icon">{{ tab.icon }}</span>
+          <span class="tab-label">{{ tab.label }}</span>
+        </a>
+      }
+    </nav>
+
+    <div class="app-header-actions">
+      <button class="btn-icon" title="New project">🗋</button>
+      <button class="btn-icon" title="Open project">📂</button>
+      <button class="btn-icon" title="Save project">💾</button>
+    </div>
+  </header>
+
+  <main class="app-content">
+    <router-outlet />
+  </main>
+</div>

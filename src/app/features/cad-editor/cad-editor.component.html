@@ -1,0 +1,38 @@
+    <div class="cad-editor">
+      <app-drawing-toolbar class="left-toolbar" />
+      <div class="cad-center">
+
+        <!-- Align toolbar — shows when 2+ entities selected -->
+        @if (selCount$ | async; as n) {
+          @if (n >= 2) {
+            <div class="align-bar">
+              <span class="align-label">Align {{ n }}:</span>
+              <div class="align-group">
+                <button title="Align Left"       (click)="align('left')">      ⊢</button>
+                <button title="Center Horizontal" (click)="align('center-h')"> ⊣⊢</button>
+                <button title="Align Right"      (click)="align('right')">     ⊣</button>
+              </div>
+              <div class="align-sep"></div>
+              <div class="align-group">
+                <button title="Align Top"        (click)="align('top')">       ⊤</button>
+                <button title="Center Vertical"  (click)="align('center-v')">  ⊥⊤</button>
+                <button title="Align Bottom"     (click)="align('bottom')">    ⊥</button>
+              </div>
+              @if (n >= 3) {
+                <div class="align-sep"></div>
+                <div class="align-group">
+                  <button title="Distribute Horizontally" (click)="align('distribute-h')">↔</button>
+                  <button title="Distribute Vertically"   (click)="align('distribute-v')">↕</button>
+                </div>
+              }
+            </div>
+          }
+        }
+
+        <app-cad-canvas class="canvas-host" />
+      </div>
+      <aside class="right-panel">
+        <app-layers-panel />
+        <app-properties-panel />
+      </aside>
+    </div>

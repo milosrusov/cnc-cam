@@ -1,0 +1,29 @@
+    <div class="panel" style="border-right: none; border-bottom: 1px solid var(--border-color); flex: 0 0 auto;">
+      <div class="panel-header">
+        <span>Layers</span>
+        <button class="btn-icon" style="font-size:14px; padding:0 4px;" (click)="addLayer()" title="Add layer">+</button>
+      </div>
+      <div class="layer-list">
+        @for (layer of layers$ | async; track layer.id) {
+          <div
+            class="layer-row"
+            [class.active]="(activeLayerId$ | async) === layer.id"
+            (click)="setActive(layer.id)"
+          >
+            <button class="icon-btn" [style.color]="layer.visible ? 'var(--text-secondary)' : 'var(--text-muted)'"
+              (click)="$event.stopPropagation(); toggleVisible(layer)" title="Toggle visibility">
+              {{ layer.visible ? '👁' : '🚫' }}
+            </button>
+            <button class="icon-btn" [style.color]="layer.locked ? 'var(--warning)' : 'var(--text-muted)'"
+              (click)="$event.stopPropagation(); toggleLock(layer)" title="Toggle lock">
+              {{ layer.locked ? '🔒' : '🔓' }}
+            </button>
+            <input class="color-dot" type="color" [value]="layer.color"
+              (change)="changeColor(layer, $any($event.target).value)"
+              (click)="$event.stopPropagation()" title="Layer color">
+            <span class="layer-name">{{ layer.name }}</span>
+            <button class="icon-btn danger" (click)="$event.stopPropagation(); deleteLayer(layer.id)" title="Delete layer">✕</button>
+          </div>
+        }
+      </div>
+    </div>

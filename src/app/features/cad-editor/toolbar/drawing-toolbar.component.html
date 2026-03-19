@@ -1,0 +1,21 @@
+    <div class="toolbar">
+      <div class="toolbar-group">
+        @for (t of selectTools; track t.tool) {
+          <button
+            class="tool-btn"
+            [class.active]="(activeTool$ | async) === t.tool"
+            [title]="t.label + ' (' + t.shortcut + ')'"
+            (click)="setTool(t.tool)"
+          >
+            <span class="tool-icon">{{ t.icon }}</span>
+          </button>
+        }
+      </div>
+
+      <div class="toolbar-separator"></div>
+
+      <div class="toolbar-group">
+        <button class="tool-btn" [disabled]="!(canUndo$ | async)" (click)="undo()" title="Undo (Ctrl+Z)">↩</button>
+        <button class="tool-btn" [disabled]="!(canRedo$ | async)" (click)="redo()" title="Redo (Ctrl+Y)">↪</button>
+      </div>
+    </div>

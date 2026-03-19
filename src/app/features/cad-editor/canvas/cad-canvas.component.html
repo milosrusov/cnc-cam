@@ -1,0 +1,14 @@
+    <div class="canvas-wrapper" #wrapper
+      [class.cursor-pan]="activeTool === 'pan' || isPanning"
+      [class.cursor-select]="activeTool === 'select' && !isPanning"
+      [class.cursor-crosshair]="activeTool !== 'select' && activeTool !== 'pan' && !isPanning"
+      tabindex="0"
+    >
+      <canvas #canvas></canvas>
+      <div class="status-bar">
+        <span class="coords">X: {{ cx }}  Y: {{ cy }}</span>
+        @if (isDrawing) { <span class="hint">{{ drawHint }}</span> }
+        @if (orthoMode) { <span class="mode-badge">ORTHO</span> }
+        <span class="zoom-level">{{ (viewport.zoom * 100) | number:'1.0-0' }}%</span>
+      </div>
+    </div>

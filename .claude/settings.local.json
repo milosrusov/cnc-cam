@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ng version:*)",
+      "Bash(npm info:*)",
+      "Bash(git clone:*)",
+      "Read(//Users/Rus/Desktop/PROJECTS/**)",
+      "Bash(ng new:*)"
+    ]
+  }
+}
